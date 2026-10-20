@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pena Hikmah: Cabaran Puzzle Islamik</title>
+    <style>
+        :root {
+            --primary: #004d40;
+            --secondary: #00796b;
+            --accent: #d4af37;
+            --bg-color: #e0f2f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border-bottom: 4px solid var(--accent);
+            box-sizing: border-box;
+        }
+
+        .header-card img.logo {
+            width: 90px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .header-card h2 {
+            margin: 5px 0 2px 0;
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .header-card h3 {
+            margin: 0;
+            color: #d4af37;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+        }
+
+        .header-card p {
+            margin: 4px 0 0 0;
+            color: #555;
+            font-size: 11px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 3px;
+            background-color: #b2dfdb;
+            padding: 6px;
+            border-radius: 10px;
+            touch-action: none;
+        }
+
+        .square {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .status-msg {
+            padding: 15px;
+            background-color: #ffe0b2;
+            color: #e65100;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Logo Menonjol -->
+    <div class="header-card">
+        <img src="https://i.postimg.cc/QtPnsW43/svg.png" alt="Logo KESUKES" class="logo">
+        <h2>BIRO AGAMA KESUKES TERENGGANU</h2>
+        <h3>Pena Hikmah: Cabaran Puzzle Islamik</h3>
+        <p>Terbuka Khusus Untuk PTJ Kemaman sahaja</p>
+    </div>
+
+    <!-- Mesej Had Masa/Timeframe -->
+    <div id="timeframe-msg" class="container status-msg hidden"></div>
+
+    <!-- Borang Pendaftaran -->
+    <div id="registration-screen" class="container">
+        <h3 style="color:var(--primary); margin-top:0; font-size:15px; text-align:center;">Pendaftaran Peserta</h3>
+        <form id="reg-form">
+            <div class="form-group">
+                <label>Nama Penuh</label>
+                <input type="text" id="nama" required placeholder="Contoh: Ahmad Bin Ali">
+            </div>
+            <div class="form-group">
+                <label>No. Kad Pengenalan (IC)</label>
+                <input type="text" id="icNo" required placeholder="Contoh: 920101115555">
+            </div>
+            <div class="form-group">
+                <label>No. WhatsApp</label>
+                <input type="tel" id="noTel" required placeholder="Contoh: 0103944128">
+            </div>
+            <div class="form-group">
+                <label>Alamat E-mel</label>
+                <input type="email" id="email" required placeholder="Contoh: ahmad@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Pusat Tanggungjawab (PTJ)</label>
+                <select id="ptj" required>
+                    <option value="">-- Pilih PTJ Anda --</option>
+                    <option value="Hospital Kemaman">Hospital Kemaman</option>
+                    <option value="Pejabat Kesihatan Kemaman">Pejabat Kesihatan Kemaman</option>
+                    <option value="Pejabat Pergigian Kemaman">Pejabat Pergigian Kemaman</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Jawatan</label>
+                <input type="text" id="jawatan" placeholder="Contoh: Penolong Pegawai Perubatan">
+            </div>
+            <button type="submit" class="btn">Mula Main</button>
+        </form>
+    </div>
+
+    <!-- Skrin Permainan Match-3 -->
+    <div id="game-screen" class="container hidden">
+        <div class="game-stats">
+            <div>Masa: <span id="timer">180</span>s</div>
+            <div>Skor: <span id="score">0</span></div>
+        </div>
+        <div class="board" id="board"></div>
+    </div>
+
+    <!-- Skrin Carta Top 5 Live -->
+    <div id="leaderboard-screen" class="container hidden">
+        <h3 style="color:var(--primary); text-align:center; margin-top:0;">CARTA 5 TOP TERATAS</h3>
+        <p style="font-size:11px; color:#666; text-align:center; margin-bottom:10px;">*Satu pemenang hanya layak untuk 1 markah tertinggi sahaja (Tiada keputusan bertindih).</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ked.</th>
+                    <th>Nama</th>
+                    <th>PTJ</th>
+                    <th>Skor</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Data dimuatkan automatik dari Google Apps Script -->
+            </tbody>
+        </table>
+        <button onclick="location.reload()" class="btn" style="margin-top:20px;">Main Lagi</button>
+    </div>
+
+    <script>
+        // === PAUTAN GOOGLE APPS SCRIPT ANDA ===
+        const WEB_APP_URL = "https://script.google.com/a/macros/moh.gov.my/s/AKfycbxmOojvp7tQ63kI19x7f_b9qaH3GeXxNgDxwo3mQn9clxhODZimswHG2Kw186vdbJsn7w/exec";
+        
+        // Tetapan Tempoh Pertandingan
+        const TARIKH_MULA = new Date("2026-07-01T08:00:00");
+        const TARIKH_TAMAT = new Date("2026-07-30T23:59:59");
+        
+        let playerData = {};
+        let score = 0;
+        let timeLeft = 180; // 3 Minit
+        let timerInterval;
+        const width = 8;
+        const squares = [];
+        const itemIcons = ['📿', '📖', '🕌', '🌙', '🕋'];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkTimeframe();
+        });
+
+        function checkTimeframe() {
+            const now = new Date();
+            const msgBox = document.getElementById('timeframe-msg');
+            
+            if (now < TARIKH_MULA) {
+                msgBox.innerText = "Cabaran E-Gaming Islamik belum bermula. Sila kembali pada: " + TARIKH_MULA.toLocaleString();
+                msgBox.classList.remove('hidden');
+                document.getElementById('registration-screen').classList.add('hidden');
+            } else if (now > TARIKH_TAMAT) {
+                msgBox.innerText = "Minta maaf, Cabaran E-Gaming Islamik telah tamat rasmi pada: " + TARIKH_TAMAT.toLocaleString();
+                msgBox.classList.remove('hidden');
+                document.getElementById('registration-screen').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('reg-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            playerData = {
+                nama: document.getElementById('nama').value,
+                icNo: document.getElementById('icNo').value,
+                noTel: document.getElementById('noTel').value,
+                email: document.getElementById('email').value,
+                ptj: document.getElementById('ptj').value,
+                jawatan: document.getElementById('jawatan').value
+            };
+
+            document.getElementById('registration-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            startGame();
+        });
+
+        function startGame() {
+            createBoard();
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            window.setInterval(function() {
+                moveDown();
+                checkRowForThree();
+                checkColumnForThree();
+            }, 100);
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                finishGame();
+            }
+        }
+
+        function createBoard() {
+            const board = document.getElementById('board');
+            for (let i = 0; i < width * width; i++) {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                square.setAttribute('draggable', true);
+                square.setAttribute('id', i);
+                
+                let randomIcon = Math.floor(Math.random() * itemIcons.length);
+                square.innerHTML = itemIcons[randomIcon];
+                
+                board.appendChild(square);
+                squares.push(square);
+            }
+
+            squares.forEach(s => s.addEventListener('dragstart', dragStart));
+            squares.forEach(s => s.addEventListener('dragend', dragEnd));
+            squares.forEach(s => s.addEventListener('dragover', e => e.preventDefault()));
+            squares.forEach(s => s.addEventListener('drop', dragDrop));
+        }
+
+        let iconBeingDragged, iconBeingReplaced, idBeingDragged, idBeingReplaced;
+
+        function dragStart() {
+            iconBeingDragged = this.innerHTML;
+            idBeingDragged = parseInt(this.id);
+        }
+
+        function dragDrop() {
+            iconBeingReplaced = this.innerHTML;
+            idBeingReplaced = parseInt(this.id);
+            this.innerHTML = iconBeingDragged;
+            squares[idBeingDragged].innerHTML = iconBeingReplaced;
+        }
+
+        function dragEnd() {
+            let validMoves = [idBeingDragged - 1, idBeingDragged - width, idBeingDragged + 1, idBeingDragged + width];
+            let validMove = validMoves.includes(idBeingReplaced);
+
+            if (idBeingReplaced && validMove) {
+                idBeingReplaced = null;
+            } else if (idBeingReplaced && !validMove) {
+                squares[idBeingReplaced].innerHTML = iconBeingReplaced;
+                squares[idBeingDragged].innerHTML = iconBeingDragged;
+            }
+        }
+
+        function checkRowForThree() {
+            for (let i = 0; i < 62; i++) {
+                let rowOfThree = [i, i + 1, i + 2];
+                let decidedIcon = squares[i].innerHTML;
+                const isBlank = squares[i].innerHTML === '';
+                const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55];
+                if (notValid.includes(i)) continue;
+
+                if (rowOfThree.every(index => squares[index].innerHTML === decidedIcon && !isBlank)) {
+                    score += 3;
+                    document.getElementById('score').innerText = score;
+                    rowOfThree.forEach(index => squares[index].innerHTML = '');
+                }
+            }
+        }
+
+        function checkColumnForThree() {
+            for (let i = 0; i < 47; i++) {
+                let columnOfThree = [i, i + width, i + width * 2];
+                let decidedIcon = squares[i].innerHTML;
+                const isBlank = squares[i].innerHTML === '';
+
+                if (columnOfThree.every(index => squares[index].innerHTML === decidedIcon && !isBlank)) {
+                    score += 3;
+                    document.getElementById('score').innerText = score;
+                    columnOfThree.forEach(index => squares[index].innerHTML = '');
+                }
+            }
+        }
+
+        function moveDown() {
+            for (let i = 0; i < 55; i++) {
+                if (squares[i + width].innerHTML === '') {
+                    squares[i + width].innerHTML = squares[i].innerHTML;
+                    squares[i].innerHTML = '';
+                }
+                const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
+                if (firstRow.includes(i) && squares[i].innerHTML === '') {
+                    let randomIcon = Math.floor(Math.random() * itemIcons.length);
+                    squares[i].innerHTML = itemIcons[randomIcon];
+                }
+            }
+        }
+
+        function finishGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.remove('hidden');
+
+            playerData.score = score;
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(playerData)
+            })
+            .then(() => loadLeaderboard())
+            .catch(err => console.error(err));
+        }
+
+        function loadLeaderboard() {
+            fetch(WEB_APP_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('leaderboard-body');
+                tbody.innerHTML = '';
+                data.forEach((p, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${p.nama}</td>
+                            <td>${p.ptj}</td>
+                            <td><b>${p.score}</b></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
