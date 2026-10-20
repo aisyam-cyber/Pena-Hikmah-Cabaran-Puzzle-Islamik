@@ -3,188 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pena Hikmah: Cabaran Puzzle Susun Nombor</title>
+    <title>Pena Hikmah: Cabaran Susun Nombor (1-8)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #004d40;
             --secondary: #00796b;
             --accent: #d4af37;
-            --bg-color: #e0f2f1;
+            --accent-glow: #ffe082;
+            --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
             margin: 0;
-            padding: 10px;
+            padding: 15px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .header-card {
-            background-color: #ffffff;
-            width: 100%;
-            max-width: 450px;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-            border-bottom: 4px solid var(--accent);
             box-sizing: border-box;
         }
 
+        .header-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 20px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,77,64,0.15);
+            margin-bottom: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+        }
+
         .header-card img.logo {
-            width: 90px;
+            width: 85px;
             height: auto;
-            margin-bottom: 5px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+            transition: transform 0.3s ease;
+        }
+
+        .header-card img.logo:hover {
+            transform: scale(1.05);
         }
 
         .header-card h2 {
-            margin: 5px 0 2px 0;
+            margin: 8px 0 2px 0;
             color: var(--primary);
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .header-card h3 {
             margin: 0;
-            color: #d4af37;
-            font-size: 14px;
-            font-weight: bold;
-            text-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+            color: var(--accent);
+            font-size: 15px;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .header-card p {
             margin: 4px 0 0 0;
             color: #555;
             font-size: 11px;
+            font-weight: 600;
         }
 
         .container {
-            background-color: #ffffff;
+            background: var(--card-bg);
             width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 420px;
+            padding: 22px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             box-sizing: border-box;
+            backdrop-filter: blur(10px);
         }
 
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             text-align: left;
         }
 
         .form-group label {
             display: block;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 700;
             color: var(--primary);
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+        }
+
+        .form-group label i {
+            margin-right: 5px;
+            color: var(--secondary);
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            padding: 11px 14px;
+            border: 1.5px solid #b2dfdb;
+            border-radius: 10px;
             box-sizing: border-box;
             font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #fcfdfe;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 8px rgba(0, 121, 107, 0.2);
+            background: #ffffff;
         }
 
         .btn {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 13px;
+            border-radius: 12px;
             width: 100%;
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             margin-top: 10px;
-            transition: background 0.2s;
+            box-shadow: 0 4px 12px rgba(0,77,64,0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn:hover {
-            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,77,64,0.4);
         }
 
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Stat Cards */
         .game-stats {
             display: flex;
             justify-content: space-between;
-            font-weight: bold;
-            color: var(--primary);
+            gap: 10px;
             margin-bottom: 15px;
-            font-size: 16px;
         }
 
-        /* Papan Grid Slide Puzzle 3x3 */
+        .stat-box {
+            flex: 1;
+            background: #e0f2f1;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #b2dfdb;
+        }
+
+        .stat-box span.title {
+            display: block;
+            font-size: 11px;
+            color: var(--secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .stat-box span.value {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        /* Puzzle Board */
         .puzzle-board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            background-color: var(--primary);
-            padding: 10px;
-            border-radius: 12px;
+            gap: 10px;
+            background: var(--primary);
+            padding: 12px;
+            border-radius: 16px;
             aspect-ratio: 1;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
         }
 
         .tile {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffffff;
+            background: linear-gradient(145deg, #ffffff, #f0f4f3);
             color: var(--primary);
-            font-size: 28px;
-            font-weight: bold;
-            border-radius: 8px;
+            font-size: 30px;
+            font-weight: 800;
+            border-radius: 12px;
             cursor: pointer;
             user-select: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.15s ease-in-out;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         .tile.empty {
-            background-color: transparent;
+            background: transparent;
             box-shadow: none;
+            border: none;
             cursor: default;
         }
 
-        .tile:not(.empty):active {
-            transform: scale(0.95);
+        .tile:not(.empty):hover {
+            background: #ffffff;
+            border-color: var(--accent);
+            transform: scale(1.02);
         }
 
-        table {
+        /* Leaderboard Styling */
+        .leaderboard-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0 6px;
             margin-top: 10px;
         }
 
-        th, td {
+        .leaderboard-table th {
             padding: 8px;
-            text-align: left;
-            font-size: 12px;
-            border-bottom: 1px solid #ddd;
+            font-size: 11px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        th {
-            background-color: var(--primary);
-            color: white;
+        .leaderboard-table td {
+            padding: 10px 12px;
+            font-size: 12px;
+            background: #f7faf9;
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .leaderboard-table tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            border-left: 1px solid #e0e0e0;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .leaderboard-table tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border-right: 1px solid #e0e0e0;
+            text-align: right;
+            font-weight: 800;
+            color: var(--primary);
         }
 
         .status-msg {
             padding: 15px;
-            background-color: #ffe0b2;
+            background-color: #fff3e0;
             color: #e65100;
-            border-radius: 8px;
+            border: 1px solid #ffe0b2;
+            border-radius: 12px;
             font-weight: bold;
             text-align: center;
+            font-size: 13px;
         }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -194,34 +293,36 @@
         <img src="https://i.postimg.cc/QtPnsW43/svg.png" alt="Logo KESUKES" class="logo">
         <h2>BIRO AGAMA KESUKES CAWANGAN KEMAMAN</h2>
         <h3>Pena Hikmah: Cabaran Susun Nombor (1-8)</h3>
-        <p>Terbuka Khusus Untuk PTJ Kemaman sahaja</p>
+        <p><i class="fa-solid fa-hospital-user"></i> Terbuka Khusus Untuk PTJ Kemaman Sahaja</p>
     </div>
 
-    <!-- Mesej Had Masa/Timeframe -->
+    <!-- Mesej Had Masa -->
     <div id="timeframe-msg" class="container status-msg hidden"></div>
 
     <!-- Borang Pendaftaran -->
     <div id="registration-screen" class="container">
-        <h3 style="color:var(--primary); margin-top:0; font-size:15px; text-align:center;">Pendaftaran Peserta</h3>
+        <h3 style="color:var(--primary); margin-top:0; font-size:16px; text-align:center;">
+            <i class="fa-solid fa-id-card"></i> Pendaftaran Peserta
+        </h3>
         <form id="reg-form">
             <div class="form-group">
-                <label>Nama Penuh</label>
+                <label><i class="fa-solid fa-user"></i> Nama Penuh</label>
                 <input type="text" id="nama" required placeholder="Contoh: Ahmad Bin Ali">
             </div>
             <div class="form-group">
-                <label>No. Kad Pengenalan (IC)</label>
+                <label><i class="fa-solid fa-address-card"></i> No. Kad Pengenalan (IC)</label>
                 <input type="text" id="icNo" required placeholder="Contoh: 920101115555">
             </div>
             <div class="form-group">
-                <label>No. WhatsApp</label>
+                <label><i class="fa-brands fa-whatsapp"></i> No. WhatsApp</label>
                 <input type="tel" id="noTel" required placeholder="Contoh: 0103944128">
             </div>
             <div class="form-group">
-                <label>Alamat E-mel</label>
+                <label><i class="fa-solid fa-envelope"></i> Alamat E-mel</label>
                 <input type="email" id="email" required placeholder="Contoh: ahmad@gmail.com">
             </div>
             <div class="form-group">
-                <label>Pusat Tanggungjawab (PTJ)</label>
+                <label><i class="fa-solid fa-building-user"></i> Pusat Tanggungjawab (PTJ)</label>
                 <select id="ptj" required>
                     <option value="">-- Pilih PTJ Anda --</option>
                     <option value="Hospital Kemaman">Hospital Kemaman</option>
@@ -230,41 +331,55 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Jawatan</label>
+                <label><i class="fa-solid fa-briefcase"></i> Jawatan</label>
                 <input type="text" id="jawatan" placeholder="Contoh: Penolong Pegawai Perubatan">
             </div>
-            <button type="submit" class="btn">Mula Main</button>
+            <button type="submit" class="btn"><i class="fa-solid fa-play"></i> Mula Permainan</button>
         </form>
     </div>
 
-    <!-- Skrin Permainan Slide Puzzle -->
+    <!-- Skrin Slide Puzzle -->
     <div id="game-screen" class="container hidden">
-        <p style="font-size:12px; color:#555; text-align:center; margin-top:0;">Susun nombor 1 hingga 8 mengikut urutan dengan mengetik petak bersebelahan ruang kosong!</p>
+        <p style="font-size:12px; color:#555; text-align:center; margin-top:0; font-weight:600;">
+            Susun nombor 1 hingga 8 mengikut urutan dengan mengetik petak bersebelahan ruang kosong!
+        </p>
         <div class="game-stats">
-            <div>Masa: <span id="timer">0</span>s</div>
-            <div>Pergerakan: <span id="moves">0</span></div>
+            <div class="stat-box">
+                <span class="title"><i class="fa-solid fa-stopwatch"></i> Masa</span>
+                <span class="value"><span id="timer">0</span>s</span>
+            </div>
+            <div class="stat-box">
+                <span class="title"><i class="fa-solid fa-hand-pointer"></i> Langkah</span>
+                <span class="value" id="moves">0</span>
+            </div>
         </div>
         <div class="puzzle-board" id="board"></div>
     </div>
 
-    <!-- Skrin Carta Top 5 Live -->
+    <!-- Skrin Leaderboard -->
     <div id="leaderboard-screen" class="container hidden">
-        <h3 style="color:var(--primary); text-align:center; margin-top:0;">CARTA 5 TOP TERATAS</h3>
-        <p style="font-size:11px; color:#666; text-align:center; margin-bottom:10px;">*Pemenang dikira berdasarkan masa penyelesaian terpanatas (skor tertinggi).</p>
-        <table>
+        <h3 style="color:var(--primary); text-align:center; margin-top:0;">
+            <i class="fa-solid fa-trophy" style="color:var(--accent);"></i> CARTA 5 TOP TERATAS
+        </h3>
+        <p style="font-size:11px; color:#666; text-align:center; margin-bottom:10px;">
+            *Hanya 1 kedudukan tertinggi dikira bagi setiap pemain (Tiada kemenangan bertindih).
+        </p>
+        <table class="leaderboard-table">
             <thead>
                 <tr>
-                    <th>Ked.</th>
-                    <th>Nama</th>
-                    <th>PTJ</th>
-                    <th>Masa (Mata)</th>
+                    <th style="width: 15%;">Ked.</th>
+                    <th style="width: 45%;">Nama</th>
+                    <th style="width: 25%;">PTJ</th>
+                    <th style="width: 15%;">Mata</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body">
-                <!-- Data dimuatkan automatik -->
+                <!-- Data dimuat naik dari Apps Script -->
             </tbody>
         </table>
-        <button onclick="location.reload()" class="btn" style="margin-top:20px;">Main Lagi</button>
+        <button onclick="location.reload()" class="btn" style="margin-top:20px;">
+            <i class="fa-solid fa-rotate-right"></i> Main Lagi
+        </button>
     </div>
 
     <script>
@@ -277,8 +392,6 @@
         let timeElapsed = 0;
         let movesCount = 0;
         let timerInterval;
-        
-        // Papan sasaran (1-8 & kosong)
         let boardState = [1, 2, 3, 4, 5, 6, 7, 8, ""];
 
         function formatDateMY(dateObj) {
@@ -298,9 +411,7 @@
             return `${day}/${month}/${year}, ${strHours}:${minutes}:${seconds} ${ampm}`;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            checkTimeframe();
-        });
+        document.addEventListener('DOMContentLoaded', checkTimeframe);
 
         function checkTimeframe() {
             const now = new Date();
@@ -349,7 +460,6 @@
             }, 1000);
         }
 
-        // Rawak nombor dengan jaminan boleh diselesaikan (Solvable Shuffle)
         function shuffleBoard() {
             let valid = false;
             while (!valid) {
@@ -391,14 +501,8 @@
 
         function moveTile(index) {
             const emptyIndex = boardState.indexOf("");
-            const validMoves = [
-                index - 1, // Kiri
-                index + 1, // Kanan
-                index - 3, // Atas
-                index + 3  // Bawah
-            ];
+            const validMoves = [index - 1, index + 1, index - 3, index + 3];
 
-            // Halang pergerakan melintas tepi grid
             const isLeftEdge = index % 3 === 0;
             const isRightEdge = index % 3 === 2;
 
@@ -406,7 +510,6 @@
                 if (isLeftEdge && emptyIndex === index - 1) return;
                 if (isRightEdge && emptyIndex === index + 1) return;
 
-                // Tukar kedudukan
                 [boardState[index], boardState[emptyIndex]] = [boardState[emptyIndex], boardState[index]];
                 movesCount++;
                 document.getElementById('moves').innerText = movesCount;
@@ -426,12 +529,11 @@
         }
 
         function finishGame() {
-            alert(`Tahniah! Anda berjaya menyusun nombor 1-8 dalam masa ${timeElapsed} detik dengan ${movesCount} pergerakan!`);
+            alert(`Tahniah! Anda berjaya menyusun nombor 1-8 dalam masa ${timeElapsed} detik dengan ${movesCount} langkah!`);
             
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
 
-            // Pengiraan skor: Lagi cepat masa, lagi tinggi markah (Contoh: 1000 - masa)
             let calculatedScore = Math.max(10, 1000 - (timeElapsed * 2) - movesCount);
             playerData.score = calculatedScore;
 
@@ -455,7 +557,7 @@
                             <td>${index + 1}</td>
                             <td>${p.nama}</td>
                             <td>${p.ptj}</td>
-                            <td><b>${p.score} pt</b></td>
+                            <td><b>${p.score}</b></td>
                         </tr>
                     `;
                 });
