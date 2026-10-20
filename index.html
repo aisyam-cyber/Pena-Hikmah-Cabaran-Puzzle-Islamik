@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pena Hikmah: Cabaran Puzzle Islamik</title>
+    <title>Pena Hikmah: Cabaran Puzzle Susun Nombor</title>
     <style>
         :root {
             --primary: #004d40;
@@ -117,31 +117,44 @@
             justify-content: space-between;
             font-weight: bold;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 16px;
         }
 
-        .board {
+        /* Papan Grid Slide Puzzle 3x3 */
+        .puzzle-board {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 3px;
-            background-color: #b2dfdb;
-            padding: 6px;
-            border-radius: 10px;
-            touch-action: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background-color: var(--primary);
+            padding: 10px;
+            border-radius: 12px;
+            aspect-ratio: 1;
         }
 
-        .square {
-            aspect-ratio: 1;
+        .tile {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
             background-color: #ffffff;
-            border-radius: 6px;
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
             user-select: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.1s ease-in-out;
+        }
+
+        .tile.empty {
+            background-color: transparent;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        .tile:not(.empty):active {
+            transform: scale(0.95);
         }
 
         table {
@@ -176,11 +189,11 @@
 </head>
 <body>
 
-    <!-- Header Logo Menonjol -->
+    <!-- Header Logo -->
     <div class="header-card">
         <img src="https://i.postimg.cc/QtPnsW43/svg.png" alt="Logo KESUKES" class="logo">
         <h2>BIRO AGAMA KESUKES CAWANGAN KEMAMAN</h2>
-        <h3>Pena Hikmah: Cabaran Puzzle Islamik</h3>
+        <h3>Pena Hikmah: Cabaran Susun Nombor (1-8)</h3>
         <p>Terbuka Khusus Untuk PTJ Kemaman sahaja</p>
     </div>
 
@@ -224,52 +237,50 @@
         </form>
     </div>
 
-    <!-- Skrin Permainan Match-3 -->
+    <!-- Skrin Permainan Slide Puzzle -->
     <div id="game-screen" class="container hidden">
+        <p style="font-size:12px; color:#555; text-align:center; margin-top:0;">Susun nombor 1 hingga 8 mengikut urutan dengan mengetik petak bersebelahan ruang kosong!</p>
         <div class="game-stats">
-            <div>Masa: <span id="timer">180</span>s</div>
-            <div>Skor: <span id="score">0</span></div>
+            <div>Masa: <span id="timer">0</span>s</div>
+            <div>Pergerakan: <span id="moves">0</span></div>
         </div>
-        <div class="board" id="board"></div>
+        <div class="puzzle-board" id="board"></div>
     </div>
 
     <!-- Skrin Carta Top 5 Live -->
     <div id="leaderboard-screen" class="container hidden">
         <h3 style="color:var(--primary); text-align:center; margin-top:0;">CARTA 5 TOP TERATAS</h3>
-        <p style="font-size:11px; color:#666; text-align:center; margin-bottom:10px;">*Satu pemenang hanya layak untuk 1 markah tertinggi sahaja (Tiada keputusan bertindih).</p>
+        <p style="font-size:11px; color:#666; text-align:center; margin-bottom:10px;">*Pemenang dikira berdasarkan masa penyelesaian terpanatas (skor tertinggi).</p>
         <table>
             <thead>
                 <tr>
                     <th>Ked.</th>
                     <th>Nama</th>
                     <th>PTJ</th>
-                    <th>Skor</th>
+                    <th>Masa (Mata)</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body">
-                <!-- Data dimuatkan automatik dari Google Apps Script -->
+                <!-- Data dimuatkan automatik -->
             </tbody>
         </table>
         <button onclick="location.reload()" class="btn" style="margin-top:20px;">Main Lagi</button>
     </div>
 
     <script>
-        // === PAUTAN GOOGLE APPS SCRIPT ANDA ===
         const WEB_APP_URL = "https://script.google.com/a/macros/moh.gov.my/s/AKfycbxmOojvp7tQ63kI19x7f_b9qaH3GeXxNgDxwo3mQn9clxhODZimswHG2Kw186vdbJsn7w/exec";
         
-        // Tetapan Tempoh Pertandingan (Hari Ini hingga 31 Oktober 2026)
         const TARIKH_MULA = new Date("2026-10-20T08:00:00");
         const TARIKH_TAMAT = new Date("2026-10-31T23:59:59");
         
         let playerData = {};
-        let score = 0;
-        let timeLeft = 180; // 3 Minit
+        let timeElapsed = 0;
+        let movesCount = 0;
         let timerInterval;
-        const width = 8;
-        const squares = [];
-        const itemIcons = ['📿', '📖', '🕌', '🌙', '🕋'];
+        
+        // Papan sasaran (1-8 & kosong)
+        let boardState = [1, 2, 3, 4, 5, 6, 7, 8, ""];
 
-        // Format Tarikh ke DD/MM/YYYY
         function formatDateMY(dateObj) {
             const day = String(dateObj.getDate()).padStart(2, '0');
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -324,121 +335,105 @@
         });
 
         function startGame() {
-            createBoard();
-            timerInterval = setInterval(updateTimer, 1000);
+            timeElapsed = 0;
+            movesCount = 0;
+            document.getElementById('timer').innerText = timeElapsed;
+            document.getElementById('moves').innerText = movesCount;
             
-            window.setInterval(function() {
-                moveDown();
-                checkRowForThree();
-                checkColumnForThree();
-            }, 100);
+            shuffleBoard();
+            renderBoard();
+            
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                document.getElementById('timer').innerText = timeElapsed;
+            }, 1000);
         }
 
-        function updateTimer() {
-            timeLeft--;
-            document.getElementById('timer').innerText = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                finishGame();
+        // Rawak nombor dengan jaminan boleh diselesaikan (Solvable Shuffle)
+        function shuffleBoard() {
+            let valid = false;
+            while (!valid) {
+                for (let i = boardState.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [boardState[i], boardState[j]] = [boardState[j], boardState[i]];
+                }
+                valid = isSolvable(boardState) && !isResolved(boardState);
             }
         }
 
-        function createBoard() {
-            const board = document.getElementById('board');
-            for (let i = 0; i < width * width; i++) {
-                const square = document.createElement('div');
-                square.classList.add('square');
-                square.setAttribute('draggable', true);
-                square.setAttribute('id', i);
+        function isSolvable(arr) {
+            let inversions = 0;
+            const nums = arr.filter(x => x !== "");
+            for (let i = 0; i < nums.length; i++) {
+                for (let j = i + 1; j < nums.length; j++) {
+                    if (nums[i] > nums[j]) inversions++;
+                }
+            }
+            return inversions % 2 === 0;
+        }
+
+        function renderBoard() {
+            const boardContainer = document.getElementById('board');
+            boardContainer.innerHTML = '';
+
+            boardState.forEach((val, idx) => {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                if (val === "") {
+                    tile.classList.add('empty');
+                } else {
+                    tile.innerText = val;
+                    tile.addEventListener('click', () => moveTile(idx));
+                }
+                boardContainer.appendChild(tile);
+            });
+        }
+
+        function moveTile(index) {
+            const emptyIndex = boardState.indexOf("");
+            const validMoves = [
+                index - 1, // Kiri
+                index + 1, // Kanan
+                index - 3, // Atas
+                index + 3  // Bawah
+            ];
+
+            // Halang pergerakan melintas tepi grid
+            const isLeftEdge = index % 3 === 0;
+            const isRightEdge = index % 3 === 2;
+
+            if (validMoves.includes(emptyIndex)) {
+                if (isLeftEdge && emptyIndex === index - 1) return;
+                if (isRightEdge && emptyIndex === index + 1) return;
+
+                // Tukar kedudukan
+                [boardState[index], boardState[emptyIndex]] = [boardState[emptyIndex], boardState[index]];
+                movesCount++;
+                document.getElementById('moves').innerText = movesCount;
                 
-                let randomIcon = Math.floor(Math.random() * itemIcons.length);
-                square.innerHTML = itemIcons[randomIcon];
-                
-                board.appendChild(square);
-                squares.push(square);
-            }
+                renderBoard();
 
-            squares.forEach(s => s.addEventListener('dragstart', dragStart));
-            squares.forEach(s => s.addEventListener('dragend', dragEnd));
-            squares.forEach(s => s.addEventListener('dragover', e => e.preventDefault()));
-            squares.forEach(s => s.addEventListener('drop', dragDrop));
-        }
-
-        let iconBeingDragged, iconBeingReplaced, idBeingDragged, idBeingReplaced;
-
-        function dragStart() {
-            iconBeingDragged = this.innerHTML;
-            idBeingDragged = parseInt(this.id);
-        }
-
-        function dragDrop() {
-            iconBeingReplaced = this.innerHTML;
-            idBeingReplaced = parseInt(this.id);
-            this.innerHTML = iconBeingDragged;
-            squares[idBeingDragged].innerHTML = iconBeingReplaced;
-        }
-
-        function dragEnd() {
-            let validMoves = [idBeingDragged - 1, idBeingDragged - width, idBeingDragged + 1, idBeingDragged + width];
-            let validMove = validMoves.includes(idBeingReplaced);
-
-            if (idBeingReplaced && validMove) {
-                idBeingReplaced = null;
-            } else if (idBeingReplaced && !validMove) {
-                squares[idBeingReplaced].innerHTML = iconBeingReplaced;
-                squares[idBeingDragged].innerHTML = iconBeingDragged;
-            }
-        }
-
-        function checkRowForThree() {
-            for (let i = 0; i < 62; i++) {
-                let rowOfThree = [i, i + 1, i + 2];
-                let decidedIcon = squares[i].innerHTML;
-                const isBlank = squares[i].innerHTML === '';
-                const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55];
-                if (notValid.includes(i)) continue;
-
-                if (rowOfThree.every(index => squares[index].innerHTML === decidedIcon && !isBlank)) {
-                    score += 3;
-                    document.getElementById('score').innerText = score;
-                    rowOfThree.forEach(index => squares[index].innerHTML = '');
+                if (isResolved(boardState)) {
+                    clearInterval(timerInterval);
+                    setTimeout(finishGame, 300);
                 }
             }
         }
 
-        function checkColumnForThree() {
-            for (let i = 0; i < 47; i++) {
-                let columnOfThree = [i, i + width, i + width * 2];
-                let decidedIcon = squares[i].innerHTML;
-                const isBlank = squares[i].innerHTML === '';
-
-                if (columnOfThree.every(index => squares[index].innerHTML === decidedIcon && !isBlank)) {
-                    score += 3;
-                    document.getElementById('score').innerText = score;
-                    columnOfThree.forEach(index => squares[index].innerHTML = '');
-                }
-            }
-        }
-
-        function moveDown() {
-            for (let i = 0; i < 55; i++) {
-                if (squares[i + width].innerHTML === '') {
-                    squares[i + width].innerHTML = squares[i].innerHTML;
-                    squares[i].innerHTML = '';
-                }
-                const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
-                if (firstRow.includes(i) && squares[i].innerHTML === '') {
-                    let randomIcon = Math.floor(Math.random() * itemIcons.length);
-                    squares[i].innerHTML = itemIcons[randomIcon];
-                }
-            }
+        function isResolved(arr) {
+            const target = [1, 2, 3, 4, 5, 6, 7, 8, ""];
+            return arr.every((val, idx) => val === target[idx]);
         }
 
         function finishGame() {
+            alert(`Tahniah! Anda berjaya menyusun nombor 1-8 dalam masa ${timeElapsed} detik dengan ${movesCount} pergerakan!`);
+            
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
 
-            playerData.score = score;
+            // Pengiraan skor: Lagi cepat masa, lagi tinggi markah (Contoh: 1000 - masa)
+            let calculatedScore = Math.max(10, 1000 - (timeElapsed * 2) - movesCount);
+            playerData.score = calculatedScore;
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
@@ -460,7 +455,7 @@
                             <td>${index + 1}</td>
                             <td>${p.nama}</td>
                             <td>${p.ptj}</td>
-                            <td><b>${p.score}</b></td>
+                            <td><b>${p.score} pt</b></td>
                         </tr>
                     `;
                 });
