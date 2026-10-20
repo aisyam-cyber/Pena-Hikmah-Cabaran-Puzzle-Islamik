@@ -291,14 +291,18 @@
       let unit = document.getElementById("unit").value;
       let jawatan = document.getElementById("jawatan").value;
       let statusMsg = document.getElementById("statusMsg");
+      let submitBtn = document.querySelector(".btn-submit");
 
       if (!nama || !ic || !noTel || !email || !fasiliti || !unit || !jawatan) {
         alert("Sila lengkapkan kesemua maklumat anggota!");
         return;
       }
 
+      // Nyahdayakan butang semasa penghantaran
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = "0.5";
       statusMsg.style.color = "#facc15";
-      statusMsg.innerText = "Menghantar data skor...";
+      statusMsg.innerText = "⏳ Menghantar data skor...";
 
       fetch(SCRIPT_URL, {
         method: "POST",
@@ -318,11 +322,33 @@
       .then(() => {
         statusMsg.style.color = "#34d399";
         statusMsg.innerText = "✅ Alhamdulillah, skor anda berjaya dihantar!";
-        setTimeout(() => { loadLeaderboard(); }, 1500);
+        
+        loadLeaderboard();
+
+        // Auto-close borang, reset ruang isian & buka leaderboard
+        setTimeout(() => {
+          document.getElementById("scoreForm").style.display = "none";
+          
+          document.getElementById("nama").value = "";
+          document.getElementById("ic").value = "";
+          document.getElementById("noTel").value = "";
+          document.getElementById("email").value = "";
+          document.getElementById("fasiliti").value = "";
+          document.getElementById("unit").value = "";
+          document.getElementById("jawatan").value = "";
+          statusMsg.innerText = "";
+
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = "1";
+
+          openModal();
+        }, 2000);
       })
       .catch(err => {
         statusMsg.style.color = "#f87171";
-        statusMsg.innerText = "❌ Gagal hantar data.";
+        statusMsg.innerText = "❌ Gagal hantar data. Sila cuba lagi.";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
       });
     }
 
