@@ -9,10 +9,13 @@
     body { text-align: center; background: #064e3b; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 15px; background-image: radial-gradient(#047857 1px, transparent 1px); background-size: 20px 20px; }
     
     /* HEADER LOGO & TAJUK */
-    .header-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 12px; }
-    .logo-kesukes { width: 90px; height: auto; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+    .header-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+    .logo-kesukes { width: 85px; height: auto; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
     h1 { font-size: 20px; color: #facc15; text-shadow: 0 0 10px rgba(250, 204, 21, 0.4); margin-bottom: 4px; font-weight: bold; }
-    p.sub { font-size: 12px; color: #a7f3d0; margin-bottom: 15px; max-width: 320px; line-height: 1.3; }
+    p.sub { font-size: 12px; color: #a7f3d0; margin-bottom: 8px; max-width: 320px; line-height: 1.3; }
+    
+    /* NOTIS TARIKH PERTANDINGAN */
+    .date-banner { background: #022c22; color: #facc15; border: 1px solid #facc15; font-size: 11px; padding: 5px 12px; border-radius: 20px; margin-bottom: 12px; font-weight: bold; }
 
     /* DASHBOARD MASA & PERGERAKAN */
     .dashboard { display: flex; justify-content: space-around; width: 310px; background: #022c22; padding: 10px; border-radius: 10px; border: 1px solid #facc15; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -21,7 +24,7 @@
 
     /* GRID PUZZLE 3x3 */
     .puzzle-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 310px; height: 310px; background: #065f46; padding: 8px; border-radius: 12px; border: 3px solid #facc15; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .tile { background: linear-gradient(135deg, #047857, #065f46); color: #facc15; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; cursor: pointer; user-select: none; border: 2px solid #34d399; transition: background 0.2s, transform 0.1s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .tile { background: linear-gradient(135deg, #047857, #065f46); color: #facc15; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; cursor: pointer; user-select: none; border: 2px solid #34d399; transition: background 0.2s, transform 0.1s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .tile:active { transform: scale(0.96); }
     .tile.empty { background: #022c22; border: 2px dashed #047857; cursor: default; }
 
@@ -66,7 +69,8 @@
   <div class="header-container">
     <img src="https://i.postimg.cc/QtPnsW43/svg.png" alt="Logo KESUKES Kemaman" class="logo-kesukes">
     <h1>🕌 Sliding Puzzle Islamik KESUKES</h1>
-    <p class="sub"><b>Biro Agama KESUKES Cawangan Kemaman</b><br>Khas Untuk Anggota Hospital Kemaman, PKD Kemaman & Pejabat Pergigian Kemaman</p>
+    <p class="sub"><b>Biro Agama KESUKES Cawangan Kemaman</b><br>Susun nombor Jawi (١ hingga ٨) dalam masa terpantas!</p>
+    <div class="date-banner" id="dateBanner">📅 Cabaran Berlangsung</div>
   </div>
 
   <div class="dashboard">
@@ -151,8 +155,20 @@
   </div>
 
   <script>
-    // PASTE URL GOOGLE APPS SCRIPT (WEB APP) ANDA DI SINI
-    const SCRIPT_URL = "https://script.google.com/a/macros/moh.gov.my/s/AKfycbwHuyqNBc6xTreZIqSNFhZIUTjNkd1PKGYDjqwm_ggoOpWAh20PNGREiXV9NAiUeXYyKQ/exec";
+    const SCRIPT_URL = "https://script.google.com/a/macros/moh.gov.my/s/AKfycbx9zq--rjXxX-JifLZpRh9CV1Vf5fIAnXe8kGjgdCqLM76NqYWlbTyAAwBJRw2nQOs-iw/exec";
+
+    // PEMANTAU NOMBOR JAWI (1-8)
+    const JAWI_NUMBERS = {
+      1: '١',
+      2: '٢',
+      3: '٣',
+      4: '٤',
+      5: '٥',
+      6: '٦',
+      7: '٧',
+      8: '٨',
+      '': ''
+    };
 
     let state = [1, 2, 3, 4, 5, 6, 7, 8, ""];
     let moves = 0;
@@ -160,6 +176,7 @@
     let timerInterval = null;
     let gameStarted = false;
     let finalCalculatedScore = 0;
+    let isPertandinganAktif = true;
 
     const board = document.getElementById("board");
     const timerDisplay = document.getElementById("timer");
@@ -174,7 +191,8 @@
         if (val === "") {
           tile.classList.add("empty");
         } else {
-          tile.innerText = val;
+          // Tukar paparan nombor Rumi ke nombor Jawi
+          tile.innerText = JAWI_NUMBERS[val] || val;
           tile.addEventListener("click", () => moveTile(idx));
         }
         board.appendChild(tile);
@@ -202,7 +220,7 @@
     }
 
     function moveTile(idx) {
-      if (!gameStarted) return;
+      if (!gameStarted || !isPertandinganAktif) return;
       const emptyIdx = state.indexOf("");
 
       if (Math.abs(idx % 3 - emptyIdx % 3) + Math.abs(Math.floor(idx / 3) - Math.floor(emptyIdx / 3)) === 1) {
@@ -221,6 +239,11 @@
     }
 
     function mulaGame() {
+      if (!isPertandinganAktif) {
+        alert("Maaf, pertandingan telah ditutup!");
+        return;
+      }
+
       state = [1, 2, 3, 4, 5, 6, 7, 8, ""];
       shuffle();
       moves = 0;
@@ -260,15 +283,23 @@
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(resData => {
+          if (resData.isAktif === false) {
+            isPertandinganAktif = false;
+            startBtn.disabled = true;
+            startBtn.style.opacity = "0.4";
+            startBtn.innerText = "🔒 PERTANDINGAN DITUTUP";
+            document.getElementById("dateBanner").innerText = "🔴 PERTANDINGAN TELAH DITUTUP";
+            document.getElementById("dateBanner").style.borderColor = "#f87171";
+            document.getElementById("dateBanner").style.color = "#f87171";
+          }
+
           let data = resData.leaderboard || resData;
           if (!data || data.length === 0) return;
 
-          // Tetapkan data bagi Top 3 Podium
           if (data[0]) { document.getElementById("p1-name").innerText = data[0].nama; document.getElementById("p1-fasiliti").innerText = data[0].fasiliti || "-"; document.getElementById("p1-unit").innerText = data[0].unit || "-"; document.getElementById("p1-score").innerText = data[0].score + " pts"; }
           if (data[1]) { document.getElementById("p2-name").innerText = data[1].nama; document.getElementById("p2-fasiliti").innerText = data[1].fasiliti || "-"; document.getElementById("p2-unit").innerText = data[1].unit || "-"; document.getElementById("p2-score").innerText = data[1].score + " pts"; }
           if (data[2]) { document.getElementById("p3-name").innerText = data[2].nama; document.getElementById("p3-fasiliti").innerText = data[2].fasiliti || "-"; document.getElementById("p3-unit").innerText = data[2].unit || "-"; document.getElementById("p3-score").innerText = data[2].score + " pts"; }
 
-          // Tetapkan data bagi Kedudukan #4 dan #5 sahaja
           let rankListHTML = "";
           for (let i = 3; i < Math.min(data.length, 5); i++) {
             rankListHTML += `
